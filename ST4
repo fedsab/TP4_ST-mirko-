@@ -1,0 +1,136 @@
+//MILSZTAIN_MACIA_SABIN
+
+//LIBRERIAS
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include <DHT.h>
+
+//ESTADOS
+int ESTADO = 1;
+#define PANTALLA1 1
+#define PANTALLA2 2
+#define SW1_5SEGS 3
+#define SW1_OFF 4
+#define SW1_OFF2 5
+#define SW2_5SEGS 6
+#define SW2_OFF2 7
+
+//VARIABLES DE TIMERS
+unsigned long timer;
+unsigned long timer1000;
+int segs;
+int segs5;
+
+//BOTONES
+#define SW1 34 //switch de aumento de horas
+int val1;
+#define SW2 35 //switch de aumento de minutos
+int val2;
+
+//PANTALLA
+#define LONGITUD 128 // longitud
+#define ALTURA 64 // altura
+Adafruit_SSD1306 display(LONGITUD, ALTURA, &Wire, -1);
+
+//SENSOR DE TEMPERATURA
+#define DHTPIN 23
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+float temp;
+float umbral = 24; //limite de temperatura
+
+void setup() 
+{
+  Serial.begin(115200);
+  Serial.println("Programa iniciado");
+
+  //Botones
+  pinMode(SW1, INPUT);
+  pinMode(SW2, INPUT);
+
+  //Display
+  dht.begin(); //inicializa en sensor de temperatura
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C); //inicializa el display
+}
+
+void loop() 
+{
+  //Se actualiza el reloj
+  timer = millis();
+
+  //Se lee la temperatura (en celcious)
+  temp = dht.readTemperature();
+
+  //Se leen los botones
+  val1 = digitalRead(SW1);
+  val2 reading2 = digitalRead(SW2);
+
+  switch (ESTADO) //INICIO DE MÁQUINA DE ESTADOS
+  {
+    case PANTALLA1:
+    display.clearDisplay(); //Se reinicia el display
+    display.setTextSize(2); //Establece el tamaño de texto
+    display.setTextColor(WHITE);
+    
+    display.setCursor(0, 10);
+    display.println("TEMP:");
+    display.setCursor(60, 10);
+    display.println(temp); //display de temperatura
+
+    display.setCursor(0, 50);
+    display.println("UMB:");
+    display.setCursor(60, 50);
+    display.println(umbral); //display de umbral
+
+    display.display(); //Muestra el display
+      
+    //CAMBIO DE ESTADO
+    if (val1 == 0)
+    {
+      ESTADO = SW1_SEGS;
+    } 
+    
+    break;
+
+
+    case SW1_SEGS:
+    if (timer < timer1000)
+    {
+      timer1000 = timer + 5000;
+
+    }
+
+    break;
+
+
+    case SW1_OFF:
+
+
+    break;
+
+
+    case PANTALLA2:
+
+
+    break;
+
+
+    case SW1_OFF2: 
+
+
+    break;
+
+
+    case SW2_5SEGS:
+
+
+    break;
+
+
+    case SW2_OFF2:
+
+
+    break;
+  }
+}
